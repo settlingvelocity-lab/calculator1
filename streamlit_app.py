@@ -40,12 +40,27 @@ LABEL = {
 
 st.markdown("""
 <style>
-.stButton>button { background:#38b6ff; color:#fff; border:none; border-radius:8px; font-weight:600; }
+/* input labels: large, bold, dark */
+[data-testid="stWidgetLabel"] p { font-size:1.05rem !important; font-weight:600 !important; color:#0b1f2a !important; }
+[data-testid="stWidgetLabel"] .katex { font-size:1.12em !important; }
+/* helper notes under inputs: small, light grey */
+.def { color:#7a8791; font-size:0.80rem; line-height:1.35; margin:-4px 0 14px 2px; }
+/* section titles inside the input panel */
+.sec { color:#0b6ea8; font-weight:700; font-size:1.08rem; margin:14px 0 6px 0;
+       padding-left:8px; border-left:4px solid #38b6ff; }
+/* predict button */
+.stButton>button { background:#38b6ff; color:#fff; border:none; border-radius:8px; font-weight:600; font-size:1.0rem; }
 .stButton>button:hover { background:#1aa1f0; color:#fff; }
-.def { color:#5b6b76; font-size:0.78rem; line-height:1.25; margin:-8px 0 8px 2px; }
-.rng { border-collapse:collapse; font-size:0.85rem; }
-.rng td, .rng th { padding:3px 8px; border-bottom:1px solid #e3e8ec; text-align:left; }
-.out { color:#c0392b; font-weight:600; }
+/* result cards */
+[data-testid="stMetric"] { background:#f4f9fd; border:1px solid #d6e8f5; border-radius:10px; padding:12px 14px; }
+[data-testid="stMetricLabel"] p { font-size:0.95rem !important; color:#3f4b54 !important; }
+[data-testid="stMetricValue"] { color:#0b6ea8; }
+/* training-range panel */
+.panel { background:#f4f9fd; border:1px solid #d6e8f5; border-radius:10px; padding:10px 12px; }
+.rng { border-collapse:collapse; font-size:0.95rem; width:100%; }
+.rng th { text-align:left; color:#3f4b54; font-weight:600; padding:4px 8px; border-bottom:2px solid #d6e8f5; }
+.rng td { padding:4px 8px; border-bottom:1px solid #e3edf5; }
+.out { color:#c0392b; font-weight:700; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -68,32 +83,32 @@ left, right = st.columns([1.35, 1])
 with left:
     st.subheader("Inputs")
 
-    st.markdown("**Particle properties**")
+    st.markdown("<div class='sec'>Particle properties</div>", unsafe_allow_html=True)
     c1, c2 = st.columns(2)
     with c1:
-        D10 = st.number_input("D\u2081\u2080 (mm)", min_value=0.001, max_value=100.0, value=0.62, step=0.01, format="%.3f")
+        D10 = st.number_input(r"$D_{10}$ (mm)", min_value=0.001, max_value=100.0, value=0.62, step=0.01, format="%.3f")
         note("Grain size at 10% passing by mass.")
-        D50 = st.number_input("D\u2085\u2080 (mm)", min_value=0.001, max_value=100.0, value=0.72, step=0.01, format="%.3f")
+        D50 = st.number_input(r"$D_{50}$ (mm)", min_value=0.001, max_value=100.0, value=0.72, step=0.01, format="%.3f")
         note("Median grain size (50% passing by mass).")
-        Cu = st.number_input("C\u1d64 (-)", min_value=1.0, max_value=30.0, value=1.19, step=0.01, format="%.2f")
+        Cu = st.number_input(r"$C_u$ (-)", min_value=1.0, max_value=30.0, value=1.19, step=0.01, format="%.2f")
         note("Uniformity coefficient, D\u2086\u2080/D\u2081\u2080. Larger values mean a wider PSD.")
     with c2:
         CSF = st.number_input("CSF (-)", min_value=0.1, max_value=1.0, value=0.67, step=0.01, format="%.2f")
         note("Corey shape factor, c/\u221a(a b). 1 = sphere; natural sand is about 0.7.")
-        rho_s = st.number_input("\u03c1\u209b (kg/m\u00b3)", min_value=1000.0, max_value=8000.0, value=2650.0, step=10.0)
+        rho_s = st.number_input(r"$\rho_s$ (kg/m³)", min_value=1000.0, max_value=8000.0, value=2650.0, step=10.0)
         note("Particle density. Quartz sand is about 2650 kg/m\u00b3; glass beads about 2430 kg/m\u00b3.")
 
-    st.markdown("**Fluid properties**")
+    st.markdown("<div class='sec'>Fluid properties</div>", unsafe_allow_html=True)
     f1, f2 = st.columns(2)
     with f1:
-        rho_f = st.number_input("\u03c1_f (kg/m\u00b3)", min_value=500.0, max_value=2000.0, value=998.2, step=0.1)
+        rho_f = st.number_input(r"$\rho_w$ (kg/m³)", min_value=500.0, max_value=2000.0, value=998.2, step=0.1)
         note("Fluid density. Water at 20 \u00b0C is 998.2 kg/m\u00b3.")
     with f2:
-        nu = st.number_input("\u03bd (m\u00b2/s)", min_value=1.0e-7, max_value=1.0e-2, value=1.004e-6,
+        nu = st.number_input(r"$\nu$ (m²/s)", min_value=1.0e-7, max_value=1.0e-2, value=1.004e-6,
                              step=1.0e-7, format="%.3e")
         note("Kinematic viscosity. Water at 20 \u00b0C is 1.004e-06 m\u00b2/s.")
 
-    st.markdown("**Concentration**")
+    st.markdown("<div class='sec'>Concentration</div>", unsafe_allow_html=True)
     m1, m2 = st.columns(2)
     mass_g = m1.number_input("Sediment mass (g)", min_value=0.0, max_value=1.0e6, value=5.0, step=0.1)
     vol_L = m2.number_input("Total volume (L)", min_value=0.001, max_value=1.0e4, value=1.0, step=0.1)
@@ -118,11 +133,11 @@ with right:
         cls = "out" if k in out_vars else ""
         rows += (f"<tr><td><i>{sym}</i> ({unit})</td><td>{fmt(lo)} to {fmt(hi)}</td>"
                  f"<td class='{cls}'>{fmt(current[k])}</td></tr>")
-    st.markdown(f"<table class='rng'><tr><th>Variable</th><th>Training range</th><th>Input</th></tr>"
-                f"{rows}</table>", unsafe_allow_html=True)
+    st.markdown(f"<div class='panel'><table class='rng'><tr><th>Variable</th><th>Training range</th><th>Input</th></tr>"
+                f"{rows}</table></div>", unsafe_allow_html=True)
     st.caption("Only water (1.004e-06 m\u00b2/s) and glycerin (1.12e-03 m\u00b2/s) were tested, "
                "so \u03bd values between them have not been tested experimentally. "
-               "\u03c1\u209b and \u03c1_f are used only in the physics-based calculation.")
+               r"$\rho_s$ and $\rho_w$ are used only in the physics-based calculation.")
 
 st.divider()
 
